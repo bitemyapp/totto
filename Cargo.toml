@@ -1,0 +1,10 @@
+[package]
+name = "totto"
+version = "0.1.0"
+authors = ["Chris Allen <cma@bitemyapp.com>"]
+
+[dependencies]
+# futures = "0.2.1"
+futures = "0.1"
+telegram-bot = "0.6.1"
+tokio-core = "0.1.17"
