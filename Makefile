@@ -4,12 +4,28 @@ env = OPENSSL_INCLUDE_DIR="/usr/local/opt/openssl/include"
 cargo = $(env) cargo
 debug-env = RUST_BACKTRACE=1 RUST_LOG=$(package)=debug
 debug-cargo = $(env) $(debug-env) cargo
+export CI_REGISTRY_IMAGE ?= "registry.gitlab.com/bitemyapp/totto"
 
 build:
 	$(cargo) build
 
-build-release:
+version:
+	rustc --version
+	cargo --version
+
+build-release: version
 	$(cargo) build --release
+
+## Build docker image
+build-image: version
+	@docker build -t "${CI_REGISTRY_IMAGE}:totto" .
+
+## Push docker image to registry
+push:
+	@docker push "${CI_REGISTRY_IMAGE}:totto"
+
+run-docker:
+	docker run -t "${CI_REGISTRY_IMAGE}:totto"
 
 clippy:
 	$(cargo) clippy

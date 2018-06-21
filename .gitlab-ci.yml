@@ -5,5 +5,7 @@ image: "rust:latest"
 # Use cargo to test the project
 test:cargo:
   script:
-  - rustc --version && cargo --version      # Print version info for debugging
-  - cargo build
+  - make build-release
+  - make build-image
+  - docker login -u gitlab-ci-token -p "${CI_BUILD_TOKEN}" "${CI_REGISTRY}"
+  - make push

@@ -1,0 +1,7 @@
+*
+!Makefile
+!src
+!Cargo.toml
+!Cargo.lock
+!build-out
+!docker-entrypoint.sh
