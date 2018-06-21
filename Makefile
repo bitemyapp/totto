@@ -16,6 +16,9 @@ version:
 build-release: version
 	$(cargo) build --release
 
+build-static-release:
+	cargo build --target x86_64-unknown-linux-musl --release
+
 ## Build docker image
 build-image: version
 	@docker build -t "${CI_REGISTRY_IMAGE}:totto" .
