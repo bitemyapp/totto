@@ -1,10 +1,11 @@
-package = your-package-name
+package = totto
 
-env = OPENSSL_INCLUDE_DIR="/usr/local/opt/openssl/include"
+env = OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include
 cargo = $(env) cargo
 debug-env = RUST_BACKTRACE=1 RUST_LOG=$(package)=debug
 debug-cargo = $(env) $(debug-env) cargo
-export CI_REGISTRY_IMAGE ?= "registry.gitlab.com/bitemyapp/totto"
+export CI_REGISTRY_IMAGE ?= registry.gitlab.com/bitemyapp/totto
+export CI_PIPELINE_ID ?= ${shell date +"%Y-%m-%d-%s"}
 
 build:
 	$(cargo) build
@@ -20,15 +21,17 @@ build-static-release:
 	cargo build --target x86_64-unknown-linux-musl --release
 
 ## Build docker image
-build-image: version
-	@docker build -t "${CI_REGISTRY_IMAGE}:totto" .
+build-image:
+	@docker build -t "${CI_REGISTRY_IMAGE}:pipeline-${CI_PIPELINE_ID}" .
+	@docker tag "${CI_REGISTRY_IMAGE}:pipeline-${CI_PIPELINE_ID}" "${CI_REGISTRY_IMAGE}:pipeline-current"
 
 ## Push docker image to registry
 push:
-	@docker push "${CI_REGISTRY_IMAGE}:totto"
+	@docker push "${CI_REGISTRY_IMAGE}:pipeline-${CI_PIPELINE_ID}"
+	@docker push "${CI_REGISTRY_IMAGE}:pipeline-current"
 
 run-docker:
-	docker run -t "${CI_REGISTRY_IMAGE}:totto"
+	docker run -t "${CI_REGISTRY_IMAGE}:pipeline-current"
 
 clippy:
 	$(cargo) clippy
