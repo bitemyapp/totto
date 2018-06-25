@@ -1,11 +1,46 @@
-# Official language image. Look for the different tagged releases at:
-# https://hub.docker.com/r/library/rust/tags/
 image: "rust:latest"
 
-# Use cargo to test the project
-test:cargo:
+stages:
+  - build
+  - deploy
+
+.anchors:
+  - &DOCKER_BUILD
+    make DOCKER_IMAGE_CURRENT="${DOCKER_IMAGE_CURRENT}" DOCKER_IMAGE_LATEST="${DOCKER_IMAGE_LATEST}" build-image &&
+    docker login -u gitlab-ci-token -p "${CI_BUILD_TOKEN}" "${CI_REGISTRY}" &&
+    make DOCKER_IMAGE_CURRENT="${DOCKER_IMAGE_CURRENT}" DOCKER_IMAGE_LATEST="${DOCKER_IMAGE_LATEST}" push
+  - &KUBE_LOGIN
+    echo "$KUBE_CA_PEM" >"$HOME/ca.pem" &&
+    kubectl config set-cluster cluster --server="$KUBE_URL" --certificate-authority="$HOME/ca.pem" --embed-certs=true &&
+    kubectl config set-credentials cluster --token="$KUBE_TOKEN" && kubectl config set-context cluster --cluster=cluster --user=cluster --namespace="$KUBE_NAMESPACE" &&
+    kubectl config use-context cluster
+    
+docker_image_dynamic:
+  stage: build
+  variables:
+    DOCKER_IMAGE_CURRENT: "${CI_REGISTRY_IMAGE}:${CI_BUILD_REF_SLUG}_${CI_PIPELINE_ID}"
+    DOCKER_IMAGE_LATEST:  "${CI_REGISTRY_IMAGE}:latest"
   script:
-  - make build-release
-  - make build-image
-  - docker login -u gitlab-ci-token -p "${CI_BUILD_TOKEN}" "${CI_REGISTRY}"
-  - make push
+  - make build-dynamic-release
+  - *DOCKER_BUILD
+
+docker_image_static:
+  stage: build
+  variables:
+    DOCKER_IMAGE_CURRENT: "${CI_REGISTRY_IMAGE}:static_${CI_BUILD_REF_SLUG}_${CI_PIPELINE_ID}"
+    DOCKER_IMAGE_LATEST:  "${CI_REGISTRY_IMAGE}:static_latest"
+  script:
+  - make build-static-release
+  - *DOCKER_BUILD
+  
+kubernetes:
+  stage: deploy
+  when: manual
+  variables:
+    DEPLOYMENT_NAME:  "totto"
+    DEPLOYMENT_IMAGE: "${CI_REGISTRY_IMAGE}:static_${CI_BUILD_REF_SLUG}_${CI_PIPELINE_ID}"
+    KUBE_SPEC:        "etc/kubernetes/totto.yaml"
+  script:
+    - *KUBE_LOGIN
+    - kubectl apply          -f <(envsubst <"${KUBE_SPEC}")
+    - kubectl rollout status -f <(envsubst <"${KUBE_SPEC}")
