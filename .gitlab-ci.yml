@@ -6,7 +6,7 @@ stages:
 
 .anchors:
   - &DOCKER_BUILD
-    make DOCKER_IMAGE_CURRENT="${DOCKER_IMAGE_CURRENT}" DOCKER_IMAGE_LATEST="${DOCKER_IMAGE_LATEST}" build-image &&
+    make DOCKER_IMAGE_CURRENT="${DOCKER_IMAGE_CURRENT}" DOCKER_IMAGE_LATEST="${DOCKER_IMAGE_LATEST}" ${DOCKER_BUILD_TARGET} &&
     docker login -u gitlab-ci-token -p "${CI_BUILD_TOKEN}" "${CI_REGISTRY}" &&
     make DOCKER_IMAGE_CURRENT="${DOCKER_IMAGE_CURRENT}" DOCKER_IMAGE_LATEST="${DOCKER_IMAGE_LATEST}" push
   - &KUBE_LOGIN
@@ -20,6 +20,7 @@ docker_image_dynamic:
   variables:
     DOCKER_IMAGE_CURRENT: "${CI_REGISTRY_IMAGE}:${CI_BUILD_REF_SLUG}_${CI_PIPELINE_ID}"
     DOCKER_IMAGE_LATEST:  "${CI_REGISTRY_IMAGE}:latest"
+    DOCKER_BUILD_TARGET: make build-dynamic-image
   script:
   - make build-dynamic-release
   - *DOCKER_BUILD
@@ -29,6 +30,7 @@ docker_image_static:
   variables:
     DOCKER_IMAGE_CURRENT: "${CI_REGISTRY_IMAGE}:static_${CI_BUILD_REF_SLUG}_${CI_PIPELINE_ID}"
     DOCKER_IMAGE_LATEST:  "${CI_REGISTRY_IMAGE}:static_latest"
+    DOCKER_BUILD_TARGET: make build-static-image
   script:
   - rustup target add x86_64-unknown-linux-musl
   - make build-static-release
