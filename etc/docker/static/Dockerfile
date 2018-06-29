@@ -2,6 +2,8 @@ FROM yasuyuky/rust-ssl-static as build
 
 COPY ./ ./
 
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install libssl-dev
+
 RUN make build-static-release
 
 RUN mkdir -p /build-out
