@@ -30,7 +30,7 @@ docker_image_static:
     DOCKER_IMAGE_CURRENT: "${CI_REGISTRY_IMAGE}:static_${CI_BUILD_REF_SLUG}_${CI_PIPELINE_ID}"
     DOCKER_IMAGE_LATEST:  "${CI_REGISTRY_IMAGE}:static_latest"
   script:
-  - rustup install x86_64-unknown-linux-musl
+  - rustup target add x86_64-unknown-linux-musl
   - make build-static-release
   - *DOCKER_BUILD
   
