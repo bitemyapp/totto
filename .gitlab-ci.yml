@@ -1,4 +1,4 @@
-image: "rust:latest"
+image: "docker@sha256:eb3f84220dfdb3d37cc5fdee03733fbe4a2c7935eebb5bd93c8f2db4c2b3b63d"
 
 stages:
   - build
@@ -6,9 +6,11 @@ stages:
 
 .anchors:
   - &DOCKER_BUILD
-    make DOCKER_IMAGE_CURRENT="${DOCKER_IMAGE_CURRENT}" DOCKER_IMAGE_LATEST="${DOCKER_IMAGE_LATEST}" ${DOCKER_BUILD_TARGET} &&
+    docker build -t "${DOCKER_IMAGE_CURRENT}" -f "./etc/docker/${DOCKER_IMAGE_TYPE}/Dockerfile" . &&
+    docker tag "${DOCKER_IMAGE_CURRENT}" "${DOCKER_IMAGE_LATEST}" &&
     docker login -u gitlab-ci-token -p "${CI_BUILD_TOKEN}" "${CI_REGISTRY}" &&
-    make DOCKER_IMAGE_CURRENT="${DOCKER_IMAGE_CURRENT}" DOCKER_IMAGE_LATEST="${DOCKER_IMAGE_LATEST}" push
+    docker push "${DOCKER_IMAGE_CURRENT}" &&
+    docker push "${DOCKER_IMAGE_LATEST}"
   - &KUBE_LOGIN
     echo "$KUBE_CA_PEM" >"$HOME/ca.pem" &&
     kubectl config set-cluster cluster --server="$KUBE_URL" --certificate-authority="$HOME/ca.pem" --embed-certs=true &&
@@ -20,9 +22,8 @@ docker_image_dynamic:
   variables:
     DOCKER_IMAGE_CURRENT: "${CI_REGISTRY_IMAGE}:${CI_BUILD_REF_SLUG}_${CI_PIPELINE_ID}"
     DOCKER_IMAGE_LATEST:  "${CI_REGISTRY_IMAGE}:latest"
-    DOCKER_BUILD_TARGET: build-dynamic-image
+    DOCKER_IMAGE_TYPE:    dynamic
   script:
-  # - make build-dynamic-release
   - *DOCKER_BUILD
 
 docker_image_static:
@@ -30,13 +31,12 @@ docker_image_static:
   variables:
     DOCKER_IMAGE_CURRENT: "${CI_REGISTRY_IMAGE}:static_${CI_BUILD_REF_SLUG}_${CI_PIPELINE_ID}"
     DOCKER_IMAGE_LATEST:  "${CI_REGISTRY_IMAGE}:static_latest"
-    DOCKER_BUILD_TARGET: build-static-image
+    DOCKER_IMAGE_TYPE:    static
   script:
-  # - rustup target add x86_64-unknown-linux-musl
-  # - make build-static-release
   - *DOCKER_BUILD
   
 kubernetes:
+  image: "lachlanevenson/k8s-kubectl@sha256:d48cf2d188a9e6d6461ca05b67f5b3a5198b5b197fd20b35db7741eecffec703"
   stage: deploy
   when: manual
   variables:
