@@ -2,6 +2,8 @@ FROM yasuyuky/rust-ssl-static as build
 
 COPY ./ ./
 
+# RUN rustup install x86_64-unknown-linux-musl
+
 RUN make build-static-release
 
 RUN mkdir -p /build-out

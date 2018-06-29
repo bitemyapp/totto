@@ -1,6 +1,6 @@
 package = totto
 
-env = OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include
+env = #OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include
 cargo = $(env) cargo
 rustc = $(env) rustc
 debug-env = RUST_BACKTRACE=1 RUST_LOG=$(package)=debug
@@ -19,7 +19,7 @@ version:
 	@$(rustc) --version
 	@$(cargo) --version
 
-build-dynamic-release: version
+build-dynamic-release:
 	$(cargo) build --release
 
 build-static-release:

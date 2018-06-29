@@ -6,7 +6,7 @@ RUN make build-dynamic-release
 
 RUN mkdir -p /build-out
 
-RUN cp target/x86_64-unknown-linux-musl/release/totto /build-out/
+RUN cp target/release/totto /build-out/
 
 RUN ls /build-out/
 
