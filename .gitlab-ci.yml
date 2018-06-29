@@ -22,7 +22,7 @@ docker_image_dynamic:
     DOCKER_IMAGE_LATEST:  "${CI_REGISTRY_IMAGE}:latest"
     DOCKER_BUILD_TARGET: build-dynamic-image
   script:
-  - make build-dynamic-release
+  # - make build-dynamic-release
   - *DOCKER_BUILD
 
 docker_image_static:
@@ -32,8 +32,8 @@ docker_image_static:
     DOCKER_IMAGE_LATEST:  "${CI_REGISTRY_IMAGE}:static_latest"
     DOCKER_BUILD_TARGET: build-static-image
   script:
-  - rustup target add x86_64-unknown-linux-musl
-  - make build-static-release
+  # - rustup target add x86_64-unknown-linux-musl
+  # - make build-static-release
   - *DOCKER_BUILD
   
 kubernetes:
