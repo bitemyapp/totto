@@ -2,7 +2,7 @@
 image: "docker@sha256:eb3f84220dfdb3d37cc5fdee03733fbe4a2c7935eebb5bd93c8f2db4c2b3b63d"
 
 services:
-  - docker@sha256:2ca0d4ee63d8911cd72aa84ff2694d68882778a1c1f34b5a36b3f761290ee751
+  - gitlab/dind@sha256:da5d8fabf924951430ff844add85ac780d38c51315b862241f5196b4422070cc
 
 stages:
   - build
