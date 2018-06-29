@@ -1,0 +1,22 @@
+---
+sudo: required
+language: bash
+
+services:
+  - docker
+
+script:
+  - make build-static-image
+
+  # - &DOCKER_BUILD
+  #   export DOCKER_HOST='tcp://docker:2375' &&
+  #   docker build -t "${DOCKER_IMAGE_CURRENT}" -f "./etc/docker/${DOCKER_IMAGE_TYPE}/Dockerfile" . &&
+  #   docker tag "${DOCKER_IMAGE_CURRENT}" "${DOCKER_IMAGE_LATEST}" &&
+  #   docker login -u gitlab-ci-token -p "${CI_BUILD_TOKEN}" "${CI_REGISTRY}" &&
+  #   docker push "${DOCKER_IMAGE_CURRENT}" &&
+  #   docker push "${DOCKER_IMAGE_LATEST}"
+  # - &KUBE_LOGIN
+  #   echo "$KUBE_CA_PEM" >"$HOME/ca.pem" &&
+  #   kubectl config set-cluster cluster --server="$KUBE_URL" --certificate-authority="$HOME/ca.pem" --embed-certs=true &&
+  #   kubectl config set-credentials cluster --token="$KUBE_TOKEN" && kubectl config set-context cluster --cluster=cluster --user=cluster --namespace="$KUBE_NAMESPACE" &&
+  #   kubectl config use-context cluster
