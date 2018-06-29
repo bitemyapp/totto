@@ -1,3 +1,4 @@
+---
 image: "docker@sha256:eb3f84220dfdb3d37cc5fdee03733fbe4a2c7935eebb5bd93c8f2db4c2b3b63d"
 
 stages:
