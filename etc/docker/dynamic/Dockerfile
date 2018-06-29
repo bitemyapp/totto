@@ -1,4 +1,4 @@
-FROM rust:latest as build
+FROM rust@sha256:1cdce1c7208150f065dac04b580ab8363a03cff7ddb745ddc2659d58dbc12ea8 as build
 
 COPY ./ ./
 
