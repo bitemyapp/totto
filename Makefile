@@ -1,6 +1,6 @@
 package = totto
 
-env = #OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include
+env = PKG_CONFIG_ALLOW_CROSS=1 #OPENSSL_INCLUDE_DIR=/usr/local/opt/openssl/include
 cargo = $(env) cargo
 rustc = $(env) rustc
 debug-env = RUST_BACKTRACE=1 RUST_LOG=$(package)=debug
