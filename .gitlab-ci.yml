@@ -1,5 +1,8 @@
 ---
-image: "docker@sha256:2ca0d4ee63d8911cd72aa84ff2694d68882778a1c1f34b5a36b3f761290ee751"
+image: "docker@sha256:eb3f84220dfdb3d37cc5fdee03733fbe4a2c7935eebb5bd93c8f2db4c2b3b63d"
+
+services:
+  - docker@sha256:2ca0d4ee63d8911cd72aa84ff2694d68882778a1c1f34b5a36b3f761290ee751
 
 stages:
   - build
@@ -7,6 +10,7 @@ stages:
 
 .anchors:
   - &DOCKER_BUILD
+    export DOCKER_HOST='tcp://docker:2375' &&
     docker build -t "${DOCKER_IMAGE_CURRENT}" -f "./etc/docker/${DOCKER_IMAGE_TYPE}/Dockerfile" . &&
     docker tag "${DOCKER_IMAGE_CURRENT}" "${DOCKER_IMAGE_LATEST}" &&
     docker login -u gitlab-ci-token -p "${CI_BUILD_TOKEN}" "${CI_REGISTRY}" &&
